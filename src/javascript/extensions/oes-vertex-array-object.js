@@ -12,6 +12,7 @@ class WebGLVertexArrayObjectOES extends Linkable {
   }
 
   _performDelete () {
+    this._vertexState.setElementArrayBuffer(null)
     delete this._vertexState
     delete this._ext._vaos[this._ | 0]
     gl.deleteVertexArrayOES.call(this._ctx, this._ | 0)
@@ -67,12 +68,6 @@ class OESVertexArrayObject {
         attrib._pointerSize = 4
         buffer._refCount -= 1
         buffer._checkDelete()
-      }
-      const elementArray = array._vertexState._elementArrayBufferBinding
-      if (elementArray != null) {
-        array._vertexState._elementArrayBufferBinding = null
-        elementArray._refCount -= 1
-        elementArray._checkDelete()
       }
     }
 

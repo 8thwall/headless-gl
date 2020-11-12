@@ -670,18 +670,6 @@ class WebGLRenderingContext extends NativeWebGLRenderingContext {
     this._errorStack.push(this.getError())
   }
 
-  _switchActiveBuffer (active, buffer) {
-    if (active !== buffer) {
-      if (active) {
-        active._refCount -= 1
-        active._checkDelete()
-      }
-      if (buffer) {
-        buffer._refCount += 1
-      }
-    }
-  }
-
   _switchActiveProgram (active) {
     if (active) {
       active._refCount -= 1
@@ -1010,20 +998,11 @@ class WebGLRenderingContext extends NativeWebGLRenderingContext {
     }
 
     if (target === gl.ARRAY_BUFFER) {
-      this._switchActiveBuffer(this._vertexGlobalState._arrayBufferBinding, buffer)
-      this._vertexGlobalState._arrayBufferBinding = buffer
+      // Buffers of type ARRAY_BUFFER are bound to the global vertex state.
+      this._vertexGlobalState.setArrayBuffer(buffer)
     } else {
-      this._switchActiveBuffer(this._vertexObjectState._elementArrayBufferBinding, buffer)
-      this._vertexObjectState._elementArrayBufferBinding = buffer
-
-      if (this._extensions.oes_vertex_array_object && this._extensions.oes_vertex_array_object._activeVertexArrayObject) {
-        const activeVertexArrayObject = this._extensions.oes_vertex_array_object._activeVertexArrayObject
-        const previousElementArrayBuffer = activeVertexArrayObject._vertexState._elementArrayBufferBinding
-        if (previousElementArrayBuffer) {
-          activeVertexArrayObject._unlink(previousElementArrayBuffer)
-        }
-        activeVertexArrayObject._link(buffer)
-      }
+      // Buffers of type ELEMENT_ARRAY_BUFFER are bound to vertex array object state.
+      this._vertexObjectState.setElementArrayBuffer(buffer)
     }
   }
 

@@ -1,4 +1,5 @@
 const { gl } = require('./native-gl')
+const { WebGLBuffer } = require('./webgl-buffer')
 
 class WebGLVertexArrayObjectAttribute {
   constructor (ctx, idx) {
@@ -33,6 +34,21 @@ class WebGLVertexArrayObjectState {
     }
     this._elementArrayBufferBinding = null
   }
+
+  setElementArrayBuffer (buffer) {
+    if (buffer !== null && !(buffer instanceof WebGLBuffer)) {
+      throw new TypeError('setElementArrayBuffer(WebGLBuffer?)')
+    }
+    const current = this._elementArrayBufferBinding
+    if (current) {
+      current._refCount -= 1
+      current._checkDelete()
+    }
+    if (buffer) {
+      buffer._refCount += 1
+    }
+    this._elementArrayBufferBinding = buffer
+  }
 }
 
 class WebGLVertexArrayGlobalState {
@@ -43,6 +59,21 @@ class WebGLVertexArrayGlobalState {
       this._attribs[i] = new WebGLVertexArrayGlobalAttribute(i)
     }
     this._arrayBufferBinding = null
+  }
+
+  setArrayBuffer (buffer) {
+    if (buffer !== null && !(buffer instanceof WebGLBuffer)) {
+      throw new TypeError('setArrayBuffer(WebGLBuffer?)')
+    }
+    const current = this._arrayBufferBinding
+    if (current) {
+      current._refCount -= 1
+      current._checkDelete()
+    }
+    if (buffer) {
+      buffer._refCount += 1
+    }
+    this._arrayBufferBinding = buffer
   }
 }
 
