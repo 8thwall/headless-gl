@@ -2,7 +2,7 @@ const bits = require('bit-twiddle')
 const { WebGLContextAttributes } = require('./webgl-context-attributes')
 const { WebGLRenderingContext, wrapContext } = require('./webgl-rendering-context')
 const { WebGLTextureUnit } = require('./webgl-texture-unit')
-const { WebGLVertexAttribute } = require('./webgl-vertex-attribute')
+const { WebGLVertexState } = require('./webgl-vertex-attribute')
 
 let CONTEXT_COUNTER = 0
 
@@ -86,12 +86,25 @@ function createContext (width, height, options) {
 
   ctx._errorStack = []
 
-  // Initialize vertex attributes
+  // Vertex attributes that are in vertex array objects.
+  ctx._defaultVertexState = new WebGLVertexState(ctx)
+  ctx._activeVertexState = ctx._defaultVertexState
+
+  const numAttribs = ctx.getParameter(ctx.MAX_VERTEX_ATTRIBS)
+
+  // Vertex attribute values that aren't in vertex array objects.
+  ctx._vertexAttribValues = new Array(numAttribs)
+  for (let i = 0; i < numAttribs; ++i) {
+    ctx._vertexAttribValues[i] = new Float32Array([0, 0, 0, 1])
+  }
+
+  /*
   const numAttribs = ctx.getParameter(ctx.MAX_VERTEX_ATTRIBS)
   ctx._vertexAttribs = new Array(numAttribs)
   for (let i = 0; i < numAttribs; ++i) {
     ctx._vertexAttribs[i] = new WebGLVertexAttribute(ctx, i)
   }
+  */
 
   // Store limits
   ctx._maxTextureSize = ctx.getParameter(ctx.MAX_TEXTURE_SIZE)

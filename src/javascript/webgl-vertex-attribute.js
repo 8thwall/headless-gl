@@ -14,8 +14,18 @@ class WebGLVertexAttribute {
     this._divisor = 0
     this._inputSize = 4
     this._inputStride = 0
-    this._data = new Float32Array([0, 0, 0, 1])
   }
 }
 
-module.exports = { WebGLVertexAttribute }
+class WebGLVertexState {
+  constructor (ctx) {
+    const numAttribs = ctx.getParameter(ctx.MAX_VERTEX_ATTRIBS)
+    this._attribs = new Array(numAttribs)
+    for (let i = 0; i < numAttribs; ++i) {
+      this._attribs[i] = new WebGLVertexAttribute(ctx, i)
+    }
+    this._activeElementArrayBuffer = null
+  }
+}
+
+module.exports = { WebGLVertexAttribute, WebGLVertexState }
