@@ -68,9 +68,9 @@ class OESVertexArrayObject {
         buffer._refCount -= 1
         buffer._checkDelete()
       }
-      const elementArray = array._vertexState._activeElementArrayBuffer
+      const elementArray = array._vertexState._elementArrayBufferBinding
       if (elementArray != null) {
-        array._vertexState._activeElementArrayBuffer = null
+        array._vertexState._elementArrayBufferBinding = null
         elementArray._refCount -= 1
         elementArray._checkDelete()
       }
@@ -110,9 +110,9 @@ class OESVertexArrayObject {
     }
 
     if (array === null) {
-      ctx._activeVertexState = ctx._defaultVertexState
+      ctx._vertexObjectState = ctx._defaultVertexObjectState
     } else {
-      ctx._activeVertexState = array._vertexState
+      ctx._vertexObjectState = array._vertexState
     }
 
     // Update the active vertex array object.

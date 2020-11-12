@@ -1,6 +1,6 @@
 const { gl } = require('./native-gl')
 
-class WebGLVertexAttribute {
+class WebGLVertexArrayObjectAttribute {
   constructor (ctx, idx) {
     this._ctx = ctx
     this._idx = idx
@@ -17,15 +17,38 @@ class WebGLVertexAttribute {
   }
 }
 
+class WebGLVertexArrayGlobalAttribute {
+  constructor (idx) {
+    this._idx = idx
+    this._data = new Float32Array([0, 0, 0, 1])
+  }
+}
+
 class WebGLVertexArrayObjectState {
   constructor (ctx) {
     const numAttribs = ctx.getParameter(ctx.MAX_VERTEX_ATTRIBS)
     this._attribs = new Array(numAttribs)
     for (let i = 0; i < numAttribs; ++i) {
-      this._attribs[i] = new WebGLVertexAttribute(ctx, i)
+      this._attribs[i] = new WebGLVertexArrayObjectAttribute(ctx, i)
     }
-    this._activeElementArrayBuffer = null
+    this._elementArrayBufferBinding = null
   }
 }
 
-module.exports = { WebGLVertexAttribute, WebGLVertexArrayObjectState }
+class WebGLVertexArrayGlobalState {
+  constructor (ctx) {
+    const numAttribs = ctx.getParameter(ctx.MAX_VERTEX_ATTRIBS)
+    this._attribs = new Array(numAttribs)
+    for (let i = 0; i < numAttribs; ++i) {
+      this._attribs[i] = new WebGLVertexArrayGlobalAttribute(i)
+    }
+    this._arrayBufferBinding = null
+  }
+}
+
+module.exports = {
+  WebGLVertexArrayObjectAttribute,
+  WebGLVertexArrayGlobalAttribute,
+  WebGLVertexArrayObjectState,
+  WebGLVertexArrayGlobalState
+}

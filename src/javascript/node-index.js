@@ -2,7 +2,7 @@ const bits = require('bit-twiddle')
 const { WebGLContextAttributes } = require('./webgl-context-attributes')
 const { WebGLRenderingContext, wrapContext } = require('./webgl-rendering-context')
 const { WebGLTextureUnit } = require('./webgl-texture-unit')
-const { WebGLVertexArrayObjectState } = require('./webgl-vertex-attribute')
+const { WebGLVertexArrayObjectState, WebGLVertexArrayGlobalState } = require('./webgl-vertex-attribute')
 
 let CONTEXT_COUNTER = 0
 
@@ -69,8 +69,6 @@ function createContext (width, height, options) {
 
   ctx._activeProgram = null
   ctx._activeFramebuffer = null
-  ctx._activeArrayBuffer = null
-  ctx._activeElementArrayBuffer = null
   ctx._activeRenderbuffer = null
   ctx._checkStencil = false
   ctx._stencilState = true
@@ -86,25 +84,12 @@ function createContext (width, height, options) {
 
   ctx._errorStack = []
 
-  // Vertex attributes that are in vertex array objects.
-  ctx._defaultVertexState = new WebGLVertexArrayObjectState(ctx)
-  ctx._activeVertexState = ctx._defaultVertexState
+  // Vertex array attributes that are in vertex array objects.
+  ctx._defaultVertexObjectState = new WebGLVertexArrayObjectState(ctx)
+  ctx._vertexObjectState = ctx._defaultVertexObjectState
 
-  const numAttribs = ctx.getParameter(ctx.MAX_VERTEX_ATTRIBS)
-
-  // Vertex attribute values that aren't in vertex array objects.
-  ctx._vertexAttribValues = new Array(numAttribs)
-  for (let i = 0; i < numAttribs; ++i) {
-    ctx._vertexAttribValues[i] = new Float32Array([0, 0, 0, 1])
-  }
-
-  /*
-  const numAttribs = ctx.getParameter(ctx.MAX_VERTEX_ATTRIBS)
-  ctx._vertexAttribs = new Array(numAttribs)
-  for (let i = 0; i < numAttribs; ++i) {
-    ctx._vertexAttribs[i] = new WebGLVertexAttribute(ctx, i)
-  }
-  */
+  // Vertex array attibures that are not in vertex array objects.
+  ctx._vertexGlobalState = new WebGLVertexArrayGlobalState(ctx)
 
   // Store limits
   ctx._maxTextureSize = ctx.getParameter(ctx.MAX_TEXTURE_SIZE)
