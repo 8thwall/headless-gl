@@ -17,7 +17,7 @@ class WebGLVertexAttribute {
   }
 }
 
-class WebGLVertexState {
+class WebGLVertexArrayObjectState {
   constructor (ctx) {
     const numAttribs = ctx.getParameter(ctx.MAX_VERTEX_ATTRIBS)
     this._attribs = new Array(numAttribs)
@@ -28,4 +28,4 @@ class WebGLVertexState {
   }
 }
 
-module.exports = { WebGLVertexAttribute, WebGLVertexState }
+module.exports = { WebGLVertexAttribute, WebGLVertexArrayObjectState }

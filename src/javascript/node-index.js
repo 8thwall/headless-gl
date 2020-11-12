@@ -2,7 +2,7 @@ const bits = require('bit-twiddle')
 const { WebGLContextAttributes } = require('./webgl-context-attributes')
 const { WebGLRenderingContext, wrapContext } = require('./webgl-rendering-context')
 const { WebGLTextureUnit } = require('./webgl-texture-unit')
-const { WebGLVertexState } = require('./webgl-vertex-attribute')
+const { WebGLVertexArrayObjectState } = require('./webgl-vertex-attribute')
 
 let CONTEXT_COUNTER = 0
 
@@ -87,7 +87,7 @@ function createContext (width, height, options) {
   ctx._errorStack = []
 
   // Vertex attributes that are in vertex array objects.
-  ctx._defaultVertexState = new WebGLVertexState(ctx)
+  ctx._defaultVertexState = new WebGLVertexArrayObjectState(ctx)
   ctx._activeVertexState = ctx._defaultVertexState
 
   const numAttribs = ctx.getParameter(ctx.MAX_VERTEX_ATTRIBS)

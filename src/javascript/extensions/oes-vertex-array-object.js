@@ -1,14 +1,14 @@
 const { Linkable } = require('../linkable')
 const { gl } = require('../native-gl')
 const { checkObject } = require('../utils')
-const { WebGLVertexState } = require('../webgl-vertex-attribute')
+const { WebGLVertexArrayObjectState } = require('../webgl-vertex-attribute')
 
 class WebGLVertexArrayObjectOES extends Linkable {
   constructor (_, ctx, ext) {
     super(_)
     this._ctx = ctx
     this._ext = ext
-    this._vertexState = new WebGLVertexState(ctx)
+    this._vertexState = new WebGLVertexArrayObjectState(ctx)
   }
 
   _performDelete () {

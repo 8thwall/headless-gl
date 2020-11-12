@@ -12,7 +12,7 @@ const { getSTACKGLResizeDrawingBuffer } = require('./extensions/stackgl-resize-d
 const { getWebGLDrawBuffers } = require('./extensions/webgl-draw-buffers')
 const { getEXTBlendMinMax } = require('./extensions/ext-blend-minmax')
 const { getEXTTextureFilterAnisotropic } = require('./extensions/ext-texture-filter-anisotropic')
-const { getOESVertexArrayObject } = require('./extensions/vertex-array-object')
+const { getOESVertexArrayObject } = require('./extensions/oes-vertex-array-object')
 const {
   bindPublics,
   checkObject,
