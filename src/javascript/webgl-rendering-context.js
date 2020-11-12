@@ -1013,8 +1013,6 @@ class WebGLRenderingContext extends NativeWebGLRenderingContext {
       this._switchActiveBuffer(this._vertexGlobalState._arrayBufferBinding, buffer)
       this._vertexGlobalState._arrayBufferBinding = buffer
     } else {
-      console.log(Object.keys(this))
-      console.log(this._vertexObjectState)
       this._switchActiveBuffer(this._vertexObjectState._elementArrayBufferBinding, buffer)
       this._vertexObjectState._elementArrayBufferBinding = buffer
 
