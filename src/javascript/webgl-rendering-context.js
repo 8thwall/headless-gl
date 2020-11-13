@@ -1623,28 +1623,10 @@ class WebGLRenderingContext extends NativeWebGLRenderingContext {
       this.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null)
     }
 
-    let linked = false
-    if (this._extensions.oes_vertex_array_object) {
-      const vaos = this._extensions.oes_vertex_array_object._vaos
-      for (const vao in vaos) {
-        if (vaos[vao]._linked(buffer)) {
-          linked = true
-          break
-        }
-      }
-    }
-
-    if (!linked) {
-      for (let i = 0; i < this._vertexObjectState._attribs.length; ++i) {
-        const attrib = this._vertexObjectState._attribs[i]
-        if (attrib._pointerBuffer === buffer) {
-          attrib._pointerBuffer = null
-          attrib._pointerStride = 0
-          attrib._pointerOffset = 0
-          attrib._pointerSize = 4
-          buffer._refCount -= 1
-        }
-      }
+    if (this._vertexObjectState === this._defaultVertexObjectState) {
+      // If no vertex array object is bound, release attrib bindings for the
+      // array buffer.
+      this._vertexObjectState.releaseArrayBuffer(buffer)
     }
 
     buffer._pendingDelete = true
@@ -3487,35 +3469,18 @@ class WebGLRenderingContext extends NativeWebGLRenderingContext {
     // Call vertex attrib pointer
     super.vertexAttribPointer(index, size, type, normalized, stride, offset)
 
-    // Save attribute pointer state
-    const attrib = this._vertexObjectState._attribs[index]
-
-    if (attrib._pointerBuffer &&
-      attrib._pointerBuffer !== this._vertexGlobalState._arrayBufferBinding) {
-      attrib._pointerBuffer._refCount -= 1
-      attrib._pointerBuffer._checkDelete()
-    }
-
-    if (this._extensions.oes_vertex_array_object && this._extensions.oes_vertex_array_object._activeVertexArrayObject) {
-      const activeVertexArrayObject = this._extensions.oes_vertex_array_object._activeVertexArrayObject
-      const activeBuffer = activeVertexArrayObject._vertexState._attribs[index]._pointerBuffer
-
-      if (activeBuffer) {
-        activeVertexArrayObject._unlink(activeBuffer)
-      }
-
-      activeVertexArrayObject._link(this._vertexGlobalState._arrayBufferBinding)
-    }
-
-    this._vertexGlobalState._arrayBufferBinding._refCount += 1
-    attrib._pointerBuffer = this._vertexGlobalState._arrayBufferBinding
-    attrib._pointerSize = size * byteSize
-    attrib._pointerOffset = offset
-    attrib._pointerStride = stride || (size * byteSize)
-    attrib._pointerType = type
-    attrib._pointerNormal = normalized
-    attrib._inputStride = stride
-    attrib._inputSize = size
+    // Update the vertex state object and references.
+    this._vertexObjectState.setVertexAttribPointer(
+      /* buffer */ this._vertexGlobalState._arrayBufferBinding,
+      /* index */ index,
+      /* pointerSize */ size * byteSize,
+      /* pointerOffset */ offset,
+      /* pointerStride */ stride || (size * byteSize),
+      /* pointerType */ type,
+      /* pointerNormal */ normalized,
+      /* inputStride */ stride,
+      /* inputSize */ size
+    )
   }
 
   viewport (x, y, width, height) {

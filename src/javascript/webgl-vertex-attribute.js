@@ -40,14 +40,75 @@ class WebGLVertexArrayObjectState {
       throw new TypeError('setElementArrayBuffer(WebGLBuffer?)')
     }
     const current = this._elementArrayBufferBinding
-    if (current) {
-      current._refCount -= 1
-      current._checkDelete()
+    if (current !== buffer) {
+      if (current) {
+        current._refCount -= 1
+        current._checkDelete()
+      }
+      if (buffer) {
+        buffer._refCount += 1
+      }
+      this._elementArrayBufferBinding = buffer
     }
-    if (buffer) {
-      buffer._refCount += 1
+  }
+
+  cleanUp () {
+    const elementArrayBuffer = this._elementArrayBufferBinding
+    if (elementArrayBuffer) {
+      elementArrayBuffer._refCount -= 1
+      elementArrayBuffer._checkDelete()
+      this._elementArrayBufferBinding = null
     }
-    this._elementArrayBufferBinding = buffer
+
+    for (let i = 0; i < this._attribs.length; ++i) {
+      const attrib = this._attribs[i]
+      if (attrib._pointerBuffer) {
+        attrib._pointerBuffer._refCount -= 1
+        attrib._pointerBuffer._checkDelete()
+        attrib._pointerBuffer = null
+      }
+    }
+  }
+
+  releaseArrayBuffer (buffer) {
+    for (let i = 0; i < this._attribs.length; ++i) {
+      const attrib = this._attribs[i]
+      if (attrib._pointerBuffer === buffer) {
+        attrib._pointerBuffer._refCount -= 1
+        attrib._pointerBuffer._checkDelete()
+        attrib._pointerBuffer = null
+      }
+    }
+  }
+
+  setVertexAttribPointer (
+    buffer,
+    index,
+    pointerSize,
+    pointerOffset,
+    pointerStride,
+    pointerType,
+    pointerNormal,
+    inputStride,
+    inputSize) {
+    const attrib = this._attribs[index]
+    if (buffer !== attrib._pointerBuffer) {
+      if (attrib._pointerBuffer) {
+        attrib._pointerBuffer._refCount -= 1
+        attrib._pointerBuffer._checkDelete()
+      }
+      if (buffer) {
+        buffer._refCount += 1
+      }
+      attrib._pointerBuffer = buffer
+    }
+    attrib._pointerSize = pointerSize
+    attrib._pointerOffset = pointerOffset
+    attrib._pointerStride = pointerStride
+    attrib._pointerType = pointerType
+    attrib._pointerNormal = pointerNormal
+    attrib._inputStride = inputStride
+    attrib._inputSize = inputSize
   }
 }
 
@@ -66,14 +127,16 @@ class WebGLVertexArrayGlobalState {
       throw new TypeError('setArrayBuffer(WebGLBuffer?)')
     }
     const current = this._arrayBufferBinding
-    if (current) {
-      current._refCount -= 1
-      current._checkDelete()
+    if (current !== buffer) {
+      if (current) {
+        current._refCount -= 1
+        current._checkDelete()
+      }
+      if (buffer) {
+        buffer._refCount += 1
+      }
+      this._arrayBufferBinding = buffer
     }
-    if (buffer) {
-      buffer._refCount += 1
-    }
-    this._arrayBufferBinding = buffer
   }
 }
 

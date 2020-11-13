@@ -12,9 +12,11 @@ class WebGLVertexArrayObjectOES extends Linkable {
   }
 
   _performDelete () {
-    this._vertexState.setElementArrayBuffer(null)
+    // Clean up the vertex state to release references to buffers.
+    this._vertexState.cleanUp()
+
     delete this._vertexState
-    delete this._ext._vaos[this._ | 0]
+    delete this._ext._vaos[this._]
     gl.deleteVertexArrayOES.call(this._ctx, this._ | 0)
   }
 }
@@ -55,20 +57,6 @@ class OESVertexArrayObject {
 
     if (this._activeVertexArrayObject === array) {
       this.bindVertexArrayOES(null)
-    }
-
-    // Clean up the attached buffers.
-    for (let i = 0; i < array._vertexState._attribs.length; ++i) {
-      const attrib = array._vertexState._attribs[i]
-      const buffer = attrib._pointerBuffer
-      if (buffer !== null) {
-        attrib._pointerBuffer = null
-        attrib._pointerStride = 0
-        attrib._pointerOffset = 0
-        attrib._pointerSize = 4
-        buffer._refCount -= 1
-        buffer._checkDelete()
-      }
     }
 
     array._pendingDelete = true
